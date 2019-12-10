@@ -12,18 +12,37 @@ let package = Package(
     ],
     products: [
         .library(
+            name: "NSLogger",
+            type: .dynamic,
+            targets: ["NSLogger"]),
+        .library(
             name: "NSLoggerSwift",
+            type: .dynamic,
             targets: ["NSLoggerSwift"]),
     ],
     targets: [
         .target(
-            name: "NSLoggerSwift",
+            name: "NSLogger",
+            dependencies: [],
             path: "Client/iOS",
-            sources: [
-                "NSLogger.swift",
-                "LoggerClient.m"
-            ],
+            sources: ["LoggerClient.m"],
             publicHeadersPath: "$(SRCROOT)/Client/iOS",
-            dependencies: []),
+            cSettings: [
+                .headerSearchPath("Client/iOS"),
+                .unsafeFlags(["-fno-objc-arc", "-Wno-nullability-completeness"]),
+            ],
+            linkerSettings: [
+                .linkedFramework("CFNetwork"),
+                .linkedFramework("SystemConfiguration"),
+                .linkedFramework("UIKit", .when(platforms: [.iOS])),
+                .linkedFramework("AppKit", .when(platforms: [.macOS])),
+                .linkedFramework("CoreServices", .when(platforms: [.macOS])),
+            ]),
+        .target(
+            name: "NSLoggerSwift",
+            dependencies: ["NSLogger"],
+            path: "Client/iOS",
+            sources: ["NSLogger.swift"],
+            publicHeadersPath: "$(SRCROOT)/Client/iOS"),
     ]
 )
